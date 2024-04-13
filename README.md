@@ -1,2 +1,0 @@
-# rdb
-DB With Types

@@ -1,1 +1,14 @@
-/target
+MakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+compile_commands.json
+Makefile
+*.cmake
+build/
+*.o
+*.obj
+*.exe
+*.out
+*.dll
+*.so
+*.dylib
