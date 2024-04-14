@@ -12,7 +12,7 @@
  * size: The size of the cell in bytes
  */
 struct MetaCell {
-  DBTypes type;
+  DBType type;
   int size;
 };
 
