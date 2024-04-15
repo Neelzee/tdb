@@ -17,7 +17,7 @@ static void null_test_success(void **state) { (void)state; /* unused */ }
 
 static void test_maybe_nothing(void **state) {
   struct Maybe nothing = {.nothing = true};
-  assert_true(nothing.nothing);
+  assert_true(is_nothing(&nothing));
 }
 
 int main(void) {

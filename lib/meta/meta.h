@@ -1,8 +1,8 @@
 #ifndef META_H
 #define META_H
 
-#include "../../consts.h"
-#include "../db.h"
+#include "../consts.h"
+#include "../db/db.h"
 
 /**
  * Meta inforation about a cell in a column

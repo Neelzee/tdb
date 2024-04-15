@@ -2,6 +2,7 @@
 #define DB_H
 
 #include <stdbool.h>
+#include <stdio.h>
 
 enum DBType {
   INT,
@@ -34,5 +35,9 @@ struct DBCell {
 };
 
 bool is_nothing(struct Maybe *maybe);
+
+bool write_cell(struct DBCell *cell);
+
+bool read_cell(struct DBCell *cell);
 
 #endif
