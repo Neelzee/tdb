@@ -1,30 +1,62 @@
 #include "../lib/db/db.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 int main() {
-  printf("Hello, world!\n");
+  printf("Doing stuff\n");
 
-  union DBLiteral value = {._int = 69};
+  // Three columns, three rows
+  union DBLiteral *lits = malloc(sizeof(union DBLiteral) * 3 * 3);
 
-  struct DBCell cell = {INT, &value};
-  struct DBCell _cell;
+  union DBLiteral *start = lits;
 
-  bool res = write_cell(&cell);
+  for (int i = 0; i < 9; i++) {
+    lits[i]._int = i;
+  }
+
+  enum DBType *row = malloc(sizeof(enum DBType) * 3);
+
+  for (int i = 0; i < 3; i++) {
+    row[i] = INT;
+  }
+
+  struct DBTable table = {
+      .name = "nils_db",
+      .row_count = 3,
+      .col_count = 3,
+      .col = row,
+  };
+
+  bool res = write_rows(&table, start, 3);
 
   if (res) {
-    printf("Saved something to a file!\n");
+    printf("WE WROTE\n");
   } else {
-    printf("Did not save something to a file!\n");
+    printf("WE BROKE\n");
   }
 
-  bool res_2 = read_cell(&_cell);
+  struct DBCell *cells = malloc(sizeof(struct DBCell) * 3);
 
-  if (res_2) {
-    printf("Read something from a file!\n");
-    printf("Value: %d\n", _cell.value->_int);
+  struct DBCell *s = cells;
+
+  res = read_row(&table, cells, 0);
+
+  if (res) {
+    printf("WE RODE\n");
+
+    for (int i = 0; i < 3; i++) {
+      union DBLiteral lit = *s[i].value;
+      printf("%d ", lit._int);
+    }
+    printf("\n");
+
   } else {
-    printf("Did not read something from a file!\n");
+    printf("WE BROKE\n");
   }
+
+  free(start);
+  free(cells);
+  free(row);
 
   return 0;
 }
