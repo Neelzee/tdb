@@ -14,3 +14,4 @@ build/
 *.dylib
 tdb
 test
+nilsmf_db
