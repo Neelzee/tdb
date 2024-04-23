@@ -1,62 +1,35 @@
 #include "../lib/db/db.h"
+#include "../lib/db/ops.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 int main() {
-  printf("Doing stuff\n");
 
-  // Three columns, three rows
-  union DBLiteral *lits = malloc(sizeof(union DBLiteral) * 3 * 3);
+  char name[] = "nils_db";
 
-  union DBLiteral *start = lits;
+  enum DBType column[] = {INT, INT, INT};
 
-  for (int i = 0; i < 9; i++) {
-    lits[i]._int = i;
-  }
+  struct DBTable *table = init_db(name, 7, column, 3);
 
-  enum DBType *row = malloc(sizeof(enum DBType) * 3);
+  struct DBReader *reader = init_reader(table);
 
-  for (int i = 0; i < 3; i++) {
-    row[i] = INT;
-  }
+  // ROWS
 
-  struct DBTable table = {
-      .name = "nils_db",
-      .row_count = 3,
-      .col_count = 3,
-      .col = row,
-  };
+  union DBLiteral *row = malloc(sizeof(union DBLiteral) * 3);
 
-  bool res = write_rows(&table, start, 3);
+  row[0]._int = 10;
+  row[1]._int = 11;
+  row[2]._int = 12;
 
-  if (res) {
-    printf("WE WROTE\n");
-  } else {
-    printf("WE BROKE\n");
-  }
+  append_row(reader, row);
 
-  struct DBCell *cells = malloc(sizeof(struct DBCell) * 3);
+  // Reads
 
-  struct DBCell *s = cells;
+  struct DBCell *row2 = read_row(reader, 0);
 
-  res = read_row(&table, cells, 0);
-
-  if (res) {
-    printf("WE RODE\n");
-
-    for (int i = 0; i < 3; i++) {
-      union DBLiteral lit = *s[i].value;
-      printf("%d ", lit._int);
-    }
-    printf("\n");
-
-  } else {
-    printf("WE BROKE\n");
-  }
-
-  free(start);
-  free(cells);
-  free(row);
+  printf("%d\n", row2[0].value->_int);
+  printf("%d\n", row2[1].value->_int);
+  printf("%d\n", row2[2].value->_int);
 
   return 0;
 }

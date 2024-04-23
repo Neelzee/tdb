@@ -1,109 +1,35 @@
 #include "db.h"
+#include <stdio.h>
 
-bool is_nothing(struct Maybe *maybe) { return maybe->nothing; }
+struct DBTable *init_db(char *o_name, int name_len, enum DBType *o_col,
+                        int col_count) {
+  struct DBTable *table = malloc(sizeof(struct DBTable));
+  table->col = o_col;
 
-bool write_cell(struct DBCell *cell) {
-  FILE *file = fopen("data.bin", "wb");
-  if (file != NULL) {
-    fwrite(cell, sizeof(struct DBCell), 1, file);
-    fclose(file);
-    return true;
-  } else {
-    return false;
+  for (int i = 0; i < name_len; i++) {
+    table->name[i] = o_name[i];
   }
+
+  table->col_count = col_count;
+
+  table->row_count = 0;
+
+  return table;
 }
 
-bool read_cell(struct DBCell *cell) {
-  FILE *file = fopen("data.bin", "rb");
-  if (file != NULL) {
-    fread(cell, sizeof(struct DBCell), 1, file);
-    fclose(file);
-    return true;
-  } else {
-    return false;
-  }
-}
+struct DBReader *init_reader(struct DBTable *o_table) {
+  struct DBReader *reader = malloc(sizeof(struct DBReader));
 
-bool overwrite_row(struct DBTable *table, union DBLiteral *cells, int row) {
+  reader->table = o_table;
 
-  FILE *file = fopen(table->name, "rb+");
+  FILE *file = fopen(o_table->name, "rb+");
 
   if (file == NULL) {
-    return false;
+    file = fopen(o_table->name, "a");
+    file = fopen(o_table->name, "rb+");
   }
 
-  /*
-   * SEEK_SET is a constant defined in the stdio.h header file,
-   * typically used with file positioning functions like fseek().
-   * > ChatGPT 2024
-   */
-  int size = sizeof(struct DBCell);
-  int row_size = size * table->col_count;
-  fseek(file, row_size * row, SEEK_SET);
-  // ^ Moves the cursor, to the specified row
-  for (int i = 0; i < table->col_count; i++) {
-    fwrite(cells, sizeof(struct DBCell), table->col_count, file);
-    // Moves the `cursor` `size` forward, relative to where the cursor is.
-    fseek(file, size, SEEK_CUR);
-    cells++;
-  }
+  reader->db = file;
 
-  return true;
-}
-
-bool append_rows(struct DBTable *table, union DBLiteral *cells, int rows) {
-  FILE *file = fopen(table->name, "ab");
-
-  if (file == NULL) {
-    return false;
-  }
-
-  int size = sizeof(union DBLiteral);
-  for (int i = 0; i < rows * table->col_count; i++) {
-    fwrite(&cells[i], size, 1, file);
-  }
-
-  return true;
-}
-
-bool write_rows(struct DBTable *table, union DBLiteral *cells, int rows) {
-  FILE *file = fopen(table->name, "wb");
-
-  if (file == NULL) {
-    return false;
-  }
-
-  int size = sizeof(union DBLiteral);
-  for (int i = 0; i < rows * table->col_count; i++) {
-    fwrite(&cells[i], size, 1, file);
-  }
-
-  return true;
-}
-
-bool read_row(struct DBTable *table, struct DBCell *cells, int row) {
-  FILE *file = fopen(table->name, "rb");
-
-  if (file == NULL) {
-    return false;
-  }
-
-  // Moves the cursor to the expected place
-
-  int size = sizeof(union DBLiteral);
-
-  fseek(file, size * table->col_count * row, SEEK_SET);
-
-  enum DBType *types = table->col;
-
-  for (int i = 0; i < table->col_count; i++) {
-    enum DBType type = types[i];
-    cells[i].type = type;
-    cells[i].value = malloc(size);
-    fread(cells[i].value, size, 1, file);
-  }
-
-  fseek(file, size * table->col_count * row, SEEK_SET);
-
-  return true;
+  return reader;
 }

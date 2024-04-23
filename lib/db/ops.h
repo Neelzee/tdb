@@ -3,6 +3,14 @@
 
 #include "db.h"
 
-bool write_cell(struct DBCell *cell, struct DBTable *table, char file[]);
+/**
+ * Appends the given row, then frees it
+ */
+void append_row(struct DBReader *b_reader, union DBLiteral *row);
+
+/**
+ * Reads the given row
+ */
+struct DBCell *read_row(struct DBReader *b_reader, int row);
 
 #endif // !OPS_H

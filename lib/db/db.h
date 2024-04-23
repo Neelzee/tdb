@@ -5,6 +5,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/**
+ * Type of a cell value
+ */
 enum DBType {
   INT,
   FLOAT,
@@ -61,32 +64,16 @@ struct DBTable {
 };
 
 /**
- * Returns true if the given Maybe is nothing
- * TODO: Remove this, it's not needed
+ * Reader
  */
-bool is_nothing(struct Maybe *maybe);
+struct DBReader {
+  FILE *db;
+  struct DBTable *table;
+};
 
-bool write_cell(struct DBCell *cell);
+struct DBTable *init_db(char name[], int name_len, enum DBType *col,
+                        int col_count);
 
-bool read_cell(struct DBCell *cell);
-
-bool init_db(struct DBTable *table);
-
-/**
- * Overwrites the n-th row with the given new row
- */
-bool overwrite_row(struct DBTable *table, union DBLiteral *cells, int row);
-
-/**
- * Writes the given rows to the db
- */
-bool append_rows(struct DBTable *table, union DBLiteral *cells, int rows);
-
-/**
- * overwrites
- */
-bool write_rows(struct DBTable *table, union DBLiteral *cells, int rows);
-
-bool read_row(struct DBTable *table, struct DBCell *cells, int row);
+struct DBReader *init_reader(struct DBTable *table);
 
 #endif
